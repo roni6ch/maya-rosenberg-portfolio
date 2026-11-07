@@ -16,10 +16,10 @@ export const siteContent: SiteContent = {
     "אני מזמינה אתכם ליצור עימי קשר ולקבוע פגישת היכרות."
   ],
   "aboutImage": {
-    "src": "/remote/2020/07/about-pic-W-white.jpg",
-    "full": "/remote/2020/07/about-pic-W-white.jpg",
-    "large": "/remote/2020/07/about-pic-W-white-1024x759.jpg",
-    "thumb": "/remote/2020/07/about-pic-W-white-300x222.jpg",
+    "src": "/maya-rosenberg-portfolio/remote/2020/07/about-pic-W-white.jpg",
+    "full": "/maya-rosenberg-portfolio/remote/2020/07/about-pic-W-white.jpg",
+    "large": "/maya-rosenberg-portfolio/remote/2020/07/about-pic-W-white-1024x759.jpg",
+    "thumb": "/maya-rosenberg-portfolio/remote/2020/07/about-pic-W-white-300x222.jpg",
     "originalUrl": "https://www.mayarosenberg.co.il/wp-content/uploads/2020/07/about-pic-W-white.jpg",
     "width": 1214,
     "height": 900,
@@ -50,10 +50,10 @@ export const siteContent: SiteContent = {
   "pressItems": [
     {
       "image": {
-        "src": "/remote/2020/08/press-6-mobile.jpg",
-        "full": "/remote/2020/08/press-6-mobile.jpg",
-        "large": "/remote/2020/08/press-6-mobile.jpg",
-        "thumb": "/remote/2020/08/press-6-mobile-300x300.jpg",
+        "src": "/maya-rosenberg-portfolio/remote/2020/08/press-6-mobile.jpg",
+        "full": "/maya-rosenberg-portfolio/remote/2020/08/press-6-mobile.jpg",
+        "large": "/maya-rosenberg-portfolio/remote/2020/08/press-6-mobile.jpg",
+        "thumb": "/maya-rosenberg-portfolio/remote/2020/08/press-6-mobile-300x300.jpg",
         "originalUrl": "https://www.mayarosenberg.co.il/wp-content/uploads/2020/08/press-6-mobile.jpg",
         "width": 650,
         "height": 650,
@@ -65,10 +65,10 @@ export const siteContent: SiteContent = {
     },
     {
       "image": {
-        "src": "/remote/2020/07/press-2-mobile-1.jpg",
-        "full": "/remote/2020/07/press-2-mobile-1.jpg",
-        "large": "/remote/2020/07/press-2-mobile-1.jpg",
-        "thumb": "/remote/2020/07/press-2-mobile-1-300x300.jpg",
+        "src": "/maya-rosenberg-portfolio/remote/2020/07/press-2-mobile-1.jpg",
+        "full": "/maya-rosenberg-portfolio/remote/2020/07/press-2-mobile-1.jpg",
+        "large": "/maya-rosenberg-portfolio/remote/2020/07/press-2-mobile-1.jpg",
+        "thumb": "/maya-rosenberg-portfolio/remote/2020/07/press-2-mobile-1-300x300.jpg",
         "originalUrl": "https://www.mayarosenberg.co.il/wp-content/uploads/2020/07/press-2-mobile-1.jpg",
         "width": 650,
         "height": 650,
@@ -80,10 +80,10 @@ export const siteContent: SiteContent = {
     },
     {
       "image": {
-        "src": "/remote/2020/08/press-5-mobile.jpg",
-        "full": "/remote/2020/08/press-5-mobile.jpg",
-        "large": "/remote/2020/08/press-5-mobile.jpg",
-        "thumb": "/remote/2020/08/press-5-mobile-300x300.jpg",
+        "src": "/maya-rosenberg-portfolio/remote/2020/08/press-5-mobile.jpg",
+        "full": "/maya-rosenberg-portfolio/remote/2020/08/press-5-mobile.jpg",
+        "large": "/maya-rosenberg-portfolio/remote/2020/08/press-5-mobile.jpg",
+        "thumb": "/maya-rosenberg-portfolio/remote/2020/08/press-5-mobile-300x300.jpg",
         "originalUrl": "https://www.mayarosenberg.co.il/wp-content/uploads/2020/08/press-5-mobile.jpg",
         "width": 650,
         "height": 650,
@@ -95,10 +95,10 @@ export const siteContent: SiteContent = {
     },
     {
       "image": {
-        "src": "/remote/2022/05/press-7-mobile.jpg",
-        "full": "/remote/2022/05/press-7-mobile.jpg",
-        "large": "/remote/2022/05/press-7-mobile.jpg",
-        "thumb": "/remote/2022/05/press-7-mobile-300x300.jpg",
+        "src": "/maya-rosenberg-portfolio/remote/2022/05/press-7-mobile.jpg",
+        "full": "/maya-rosenberg-portfolio/remote/2022/05/press-7-mobile.jpg",
+        "large": "/maya-rosenberg-portfolio/remote/2022/05/press-7-mobile.jpg",
+        "thumb": "/maya-rosenberg-portfolio/remote/2022/05/press-7-mobile-300x300.jpg",
         "originalUrl": "https://www.mayarosenberg.co.il/wp-content/uploads/2022/05/press-7-mobile.jpg",
         "width": 650,
         "height": 650,
@@ -110,10 +110,10 @@ export const siteContent: SiteContent = {
     },
     {
       "image": {
-        "src": "/remote/2020/07/press-1-mobile.jpg",
-        "full": "/remote/2020/07/press-1-mobile.jpg",
-        "large": "/remote/2020/07/press-1-mobile.jpg",
-        "thumb": "/remote/2020/07/press-1-mobile-300x300.jpg",
+        "src": "/maya-rosenberg-portfolio/remote/2020/07/press-1-mobile.jpg",
+        "full": "/maya-rosenberg-portfolio/remote/2020/07/press-1-mobile.jpg",
+        "large": "/maya-rosenberg-portfolio/remote/2020/07/press-1-mobile.jpg",
+        "thumb": "/maya-rosenberg-portfolio/remote/2020/07/press-1-mobile-300x300.jpg",
         "originalUrl": "https://www.mayarosenberg.co.il/wp-content/uploads/2020/07/press-1-mobile.jpg",
         "width": 650,
         "height": 650,

@@ -18,8 +18,8 @@ export function SiteFooter() {
             {aboutImage && (
               <div className="relative w-28 shrink-0 overflow-hidden sm:w-36 md:w-44">
                 <RemoteImg
-                  src={aboutImage.large}
-                  thumb={aboutImage.thumb}
+                  src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${aboutImage.large}`}
+                  thumb={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${aboutImage.thumb}`}
                   alt="Maya Rosenberg, architect"
                   width={4}
                   height={5}

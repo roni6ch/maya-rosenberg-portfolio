@@ -23,8 +23,8 @@ export function AboutSection({ content }: AboutSectionProps) {
             <div data-reveal className="overflow-hidden">
               <RemoteImg
                 reveal
-                src={`${process.env.NEXT_PUBLIC_BASE_PATH || '/maya-rosenberg-portfolio'}${aboutImage.full}`}
-                thumb={`${process.env.NEXT_PUBLIC_BASE_PATH || '/maya-rosenberg-portfolio'}${aboutImage.thumb}`}
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${aboutImage.full}`}
+                thumb={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${aboutImage.thumb}`}
                 alt="Maya Rosenberg, architect"
                 width={aboutImage.width}
                 height={aboutImage.height}

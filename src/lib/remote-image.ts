@@ -24,5 +24,5 @@ export function toOriginalUrl({ url }: ImageSizeParams): string {
 /** Prefix a root-relative asset path with the deployment base path (set when hosted under a sub-path, e.g. GitHub Pages). */
 export function withBasePath({ path }: { path: string }): string {
   if (!path.startsWith('/')) return path
-  return `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/maya-rosenberg-portfolio'}${path}`
+  return `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}${path}`
 }

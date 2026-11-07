@@ -37,8 +37,8 @@ export function ProjectCard({ id, index, title, location, year, variant, cover }
       <div className="relative overflow-hidden">
         <RemoteImg
           rise
-          src={cover.large}
-          thumb={cover.thumb}
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${cover.large}`}
+          thumb={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${cover.thumb}`}
           alt={title}
           width={ratio.width}
           height={ratio.height}

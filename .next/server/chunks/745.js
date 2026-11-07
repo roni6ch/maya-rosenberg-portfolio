@@ -1,0 +1,13 @@
+"use strict";exports.id=745,exports.ids=[745],exports.modules={707:(e,t,r)=>{Object.defineProperty(t,"__esModule",{value:!0}),function(e,t){for(var r in t)Object.defineProperty(e,r,{enumerable:!0,get:t[r]})}(t,{resolveManifest:function(){return i},resolveRobots:function(){return n},resolveRouteData:function(){return a},resolveSitemap:function(){return l}});let o=r(1389);function n(e){let t="";for(let r of Array.isArray(e.rules)?e.rules:[e.rules]){for(let e of(0,o.resolveArray)(r.userAgent||["*"]))t+=`User-Agent: ${e}
+`;if(r.allow)for(let e of(0,o.resolveArray)(r.allow))t+=`Allow: ${e}
+`;if(r.disallow)for(let e of(0,o.resolveArray)(r.disallow))t+=`Disallow: ${e}
+`;r.crawlDelay&&(t+=`Crawl-delay: ${r.crawlDelay}
+`),t+="\n"}return e.host&&(t+=`Host: ${e.host}
+`),e.sitemap&&(0,o.resolveArray)(e.sitemap).forEach(e=>{t+=`Sitemap: ${e}
+`}),t}function l(e){let t=e.some(e=>Object.keys(e.alternates??{}).length>0),r="";for(let n of(r+='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',t?r+=' xmlns:xhtml="http://www.w3.org/1999/xhtml">\n':r+=">\n",e)){var o;r+=`<url>
+<loc>${n.url}</loc>
+`;let e=null==(o=n.alternates)?void 0:o.languages;if(e&&Object.keys(e).length)for(let t in e)r+=`<xhtml:link rel="alternate" hreflang="${t}" href="${e[t]}" />
+`;if(n.lastModified){let e=n.lastModified instanceof Date?n.lastModified.toISOString():n.lastModified;r+=`<lastmod>${e}</lastmod>
+`}n.changeFrequency&&(r+=`<changefreq>${n.changeFrequency}</changefreq>
+`),"number"==typeof n.priority&&(r+=`<priority>${n.priority}</priority>
+`),r+="</url>\n"}return r+"</urlset>\n"}function i(e){return JSON.stringify(e)}function a(e,t){return"robots"===t?n(e):"sitemap"===t?l(e):"manifest"===t?i(e):""}},1389:(e,t)=>{function r(e){return Array.isArray(e)?e:[e]}function o(e){if(null!=e)return r(e)}Object.defineProperty(t,"__esModule",{value:!0}),function(e,t){for(var r in t)Object.defineProperty(e,r,{enumerable:!0,get:t[r]})}(t,{resolveArray:function(){return r},resolveAsArrayOrUndefined:function(){return o}})},2974:(e,t,r)=>{r.d(t,{_O:()=>n});let o={aboutImage:{src:"/remote/2020/07/about-pic-W-white.jpg",full:"/remote/2020/07/about-pic-W-white.jpg",large:"/remote/2020/07/about-pic-W-white-1024x759.jpg",thumb:"/remote/2020/07/about-pic-W-white-300x222.jpg",originalUrl:"https://www.mayarosenberg.co.il/wp-content/uploads/2020/07/about-pic-W-white.jpg",width:1214,height:900,alt:"מאיה רוזנברג",kind:"photo"}},n="https://roni6ch.github.io/maya-rosenberg-portfolio";o.aboutImage?.originalUrl,o.aboutImage?.width,o.aboutImage?.height}};

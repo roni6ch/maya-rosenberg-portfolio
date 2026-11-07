@@ -1,0 +1,51 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-763b33b609d69b71.js",
+      "static/chunks/fd9d1056-6c78a265dce79e91.js",
+      "static/chunks/117-e5889921e55c476a.js",
+      "static/chunks/main-app-2f87f26c232bf089.js",
+      "static/chunks/app/_not-found/page-6dfc2729a637c065.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-763b33b609d69b71.js",
+      "static/chunks/fd9d1056-6c78a265dce79e91.js",
+      "static/chunks/117-e5889921e55c476a.js",
+      "static/chunks/main-app-2f87f26c232bf089.js",
+      "static/css/3970c229a89242c7.css",
+      "static/chunks/648-f6df95e4f3b97ad8.js",
+      "static/chunks/app/layout-ffbafa67160508fb.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-763b33b609d69b71.js",
+      "static/chunks/fd9d1056-6c78a265dce79e91.js",
+      "static/chunks/117-e5889921e55c476a.js",
+      "static/chunks/main-app-2f87f26c232bf089.js",
+      "static/chunks/c15bf2b0-16a9f7122f7ac8c3.js",
+      "static/chunks/956-8622f865e0e455b8.js",
+      "static/chunks/app/page-579e63f3bb164829.js"
+    ],
+    "/accessibility/page": [
+      "static/chunks/webpack-763b33b609d69b71.js",
+      "static/chunks/fd9d1056-6c78a265dce79e91.js",
+      "static/chunks/117-e5889921e55c476a.js",
+      "static/chunks/main-app-2f87f26c232bf089.js",
+      "static/chunks/c15bf2b0-16a9f7122f7ac8c3.js",
+      "static/chunks/145-13d0c140b58e087b.js",
+      "static/chunks/648-f6df95e4f3b97ad8.js",
+      "static/chunks/956-8622f865e0e455b8.js",
+      "static/chunks/app/accessibility/page-e6d15ba07def2128.js"
+    ],
+    "/privacy/page": [
+      "static/chunks/webpack-763b33b609d69b71.js",
+      "static/chunks/fd9d1056-6c78a265dce79e91.js",
+      "static/chunks/117-e5889921e55c476a.js",
+      "static/chunks/main-app-2f87f26c232bf089.js",
+      "static/chunks/c15bf2b0-16a9f7122f7ac8c3.js",
+      "static/chunks/145-13d0c140b58e087b.js",
+      "static/chunks/648-f6df95e4f3b97ad8.js",
+      "static/chunks/956-8622f865e0e455b8.js",
+      "static/chunks/app/privacy/page-9e99ae49131b4a19.js"
+    ]
+  }
+}

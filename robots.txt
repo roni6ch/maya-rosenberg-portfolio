@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://roni6ch.github.io/maya-rosenberg-portfolio
+Sitemap: https://roni6ch.github.io/maya-rosenberg-portfolio/sitemap.xml

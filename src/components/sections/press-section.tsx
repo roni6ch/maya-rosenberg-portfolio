@@ -23,6 +23,7 @@ export function PressSection({ content }: PressSectionProps) {
   )
 }
 
+
 interface PressCardProps {
   item: PressItem
   index: number
@@ -41,8 +42,8 @@ function PressCard({ item, index }: PressCardProps) {
     >
       <RemoteImg
         reveal
-        src={image.large}
-        thumb={image.thumb}
+        src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${image.large}`}
+        thumb={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${image.thumb}`}
         alt={image.alt || `${outlet} press feature`}
         width={image.width}
         height={image.height}

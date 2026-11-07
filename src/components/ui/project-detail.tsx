@@ -72,8 +72,8 @@ export function ProjectDetail({ projects }: ProjectDetailProps) {
             <div key={image.src} data-reveal className={getSpan({ index, isPortrait: image.height > image.width })}>
               <RemoteImg
                 reveal
-                src={image.full}
-                thumb={image.large}
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${image.full}`}
+                thumb={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}${image.large}`}
                 alt={image.alt || `${project.title} ${index + 1}`}
                 width={image.width}
                 height={image.height}

@@ -70,7 +70,16 @@ export function ProjectDetail({ projects }: ProjectDetailProps) {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:gap-6">
           {project.images.map((image, index) => (
             <div key={image.src} data-reveal className={getSpan({ index, isPortrait: image.height > image.width })}>
-              <RemoteImg reveal src={image.full} thumb={image.large} alt={image.alt || `${project.title} ${index + 1}`} width={image.width} height={image.height} eager={index < 2} />
+              <RemoteImg
+                reveal
+                src={image.full}
+                thumb={image.large}
+                alt={image.alt || `${project.title} ${index + 1}`}
+                width={image.width}
+                height={image.height}
+                priority={index === 0}
+                sizes={image.height > image.width ? '(max-width: 768px) 100vw, 33vw' : '(max-width: 768px) 100vw, 80vw'}
+              />
             </div>
           ))}
         </div>

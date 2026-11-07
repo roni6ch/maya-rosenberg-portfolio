@@ -14,6 +14,7 @@ interface CameraRigProps {
 const INTRO_OFFSET = new Vector3(7, 11, 34)
 const HERO_LOOK = new Vector3(0, 3, 0)
 const BASE_FOV = 42
+const COMPACT_FOV = 50
 const FOV_KICK = 8
 /** world units per second that count as "full speed" for velocity-driven effects */
 const FULL_SPEED = 20
@@ -71,7 +72,8 @@ export function CameraRig({ layout }: CameraRigProps) {
     motion.roll = MathUtils.damp(motion.roll, targetRoll, 2.5, delta)
     camera.rotateZ(motion.roll)
 
-    motion.fov = MathUtils.damp(motion.fov, BASE_FOV + sceneState.velocity * FOV_KICK, 3, delta)
+    const baseFov = sceneState.isCompact ? COMPACT_FOV : BASE_FOV
+    motion.fov = MathUtils.damp(motion.fov, baseFov + sceneState.velocity * FOV_KICK, 3, delta)
     if (Math.abs(camera.fov - motion.fov) > 0.01) {
       camera.fov = motion.fov
       camera.updateProjectionMatrix()

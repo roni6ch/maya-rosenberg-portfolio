@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --journey-screen: 120vh;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --journey-screen: 95vh;
+  }
+}
+
 html {
-  background: #0a0b0e;
+  background: #d4cfc4;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 html.lenis,
@@ -88,9 +103,23 @@ html.a11y-readable * {
   }
 }
 
+.snake-overlay {
+  will-change: transform;
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 768px) {
+  .snake-overlay path {
+    stroke-width: 0.45px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .loader-line,
   .scroll-cue {
     animation: none;
+  }
+  .snake-overlay {
+    display: none;
   }
 }

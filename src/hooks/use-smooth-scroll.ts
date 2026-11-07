@@ -3,12 +3,11 @@
 import { useEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Lenis from 'lenis'
 import { sceneState, scrollApi, useIntroDone } from '@/lib/scene-state'
 
 const LOCK_CLASS = 'is-intro'
 
-/** Lenis smooth scroll wired into GSAP's ticker, and a ScrollTrigger that feeds the 3D camera progress. */
+/** Journey ScrollTrigger on mount; Lenis starts only after the intro so boot stays lighter. */
 export function useSmoothScroll() {
   const introDone = useIntroDone()
 
@@ -20,17 +19,6 @@ export function useSmoothScroll() {
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     sceneState.reducedMotion = reduced
-
-    let lenis: Lenis | null = null
-    let tick: ((time: number) => void) | null = null
-    if (!reduced) {
-      lenis = new Lenis({ duration: 1.25, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true })
-      lenis.on('scroll', ScrollTrigger.update)
-      tick = (time) => lenis?.raf(time * 1000)
-      gsap.ticker.add(tick)
-      gsap.ticker.lagSmoothing(0)
-      scrollApi.lenis = lenis
-    }
 
     const trigger = ScrollTrigger.create({
       trigger: '#journey',
@@ -44,16 +32,38 @@ export function useSmoothScroll() {
 
     return () => {
       trigger.kill()
-      if (tick) gsap.ticker.remove(tick)
-      lenis?.destroy()
-      scrollApi.lenis = null
     }
   }, [])
 
   useEffect(() => {
     if (!introDone) return
     document.documentElement.classList.remove(LOCK_CLASS)
-    ScrollTrigger.refresh()
+
+    if (sceneState.reducedMotion) {
+      ScrollTrigger.refresh()
+      return
+    }
+
+    let cancelled = false
+    let tick: ((time: number) => void) | null = null
+
+    void import('lenis').then(({ default: Lenis }) => {
+      if (cancelled) return
+      const lenis = new Lenis({ duration: 1.25, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true })
+      lenis.on('scroll', ScrollTrigger.update)
+      tick = (time) => lenis.raf(time * 1000)
+      gsap.ticker.add(tick)
+      gsap.ticker.lagSmoothing(0)
+      scrollApi.lenis = lenis
+      ScrollTrigger.refresh()
+    })
+
+    return () => {
+      cancelled = true
+      if (tick) gsap.ticker.remove(tick)
+      scrollApi.lenis?.destroy()
+      scrollApi.lenis = null
+    }
   }, [introDone])
 }
 

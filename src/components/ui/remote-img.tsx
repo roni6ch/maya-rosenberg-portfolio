@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { withBasePath } from '@/lib/remote-image'
+import Image from 'next/image'
+import { useState } from 'react'
 
 interface RemoteImgProps {
   src: string
@@ -12,23 +12,37 @@ interface RemoteImgProps {
   height: number
   className?: string
   imgClassName?: string
+  /** only for the true LCP / above-fold hero image */
+  priority?: boolean
+  /** @deprecated use priority — kept for call-site compatibility */
   eager?: boolean
   /** opt into the scroll-reveal clip wipe + parallax (see use-scroll-reveal) */
   reveal?: boolean
   /** opt into the bottom-to-top work-list choreography (see use-work-rise) */
   rise?: boolean
+  /** responsive hint for the browser (static export keeps unoptimized URLs) */
+  sizes?: string
 }
 
-/** Lazy remote image with a skeleton while loading and a quiet fallback if the host fails. */
-export function RemoteImg({ src, thumb, alt, width, height, className = '', imgClassName = '', eager = false, reveal = false, rise = false }: RemoteImgProps) {
-  const imgRef = useRef<HTMLImageElement>(null)
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+const DEFAULT_SIZES = '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 40vw'
 
-  useEffect(() => {
-    const image = imgRef.current
-    if (!image?.complete) return
-    setStatus(image.naturalWidth > 0 ? 'ready' : 'error')
-  }, [src])
+/** Lazy remote image via next/image with skeleton, LQIP, and layout-shift-safe aspect ratio. */
+export function RemoteImg({
+  src,
+  thumb,
+  alt,
+  width,
+  height,
+  className = '',
+  imgClassName = '',
+  priority = false,
+  eager = false,
+  reveal = false,
+  rise = false,
+  sizes = DEFAULT_SIZES
+}: RemoteImgProps) {
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const isPriority = priority || eager
 
   return (
     <div
@@ -38,26 +52,33 @@ export function RemoteImg({ src, thumb, alt, width, height, className = '', imgC
       style={{ aspectRatio: `${width} / ${height}` }}
     >
       {thumb && status === 'loading' && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={withBasePath({ path: thumb })} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-105 object-cover blur-md" />
+        <Image
+          src={thumb}
+          alt=""
+          aria-hidden
+          fill
+          sizes={sizes}
+          unoptimized
+          priority={false}
+          className="object-cover blur-md scale-105"
+        />
       )}
       {status === 'loading' && <div className="absolute inset-0 animate-pulse bg-[#d9d7d1]/40" />}
       {status === 'error' ? (
         <div className="absolute inset-0 grid place-items-center text-[10px] uppercase tracking-wider2 text-mist">Image unavailable</div>
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          ref={imgRef}
-          src={withBasePath({ path: src })}
+        <Image
+          src={src}
           alt={alt}
-          width={width}
-          height={height}
-          loading={eager ? 'eager' : 'lazy'}
-          fetchPriority={eager ? 'high' : 'auto'}
+          fill
+          sizes={sizes}
+          unoptimized
+          priority={isPriority}
+          loading={isPriority ? 'eager' : 'lazy'}
           decoding="async"
           onLoad={() => setStatus('ready')}
           onError={() => setStatus('error')}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${status === 'ready' ? 'opacity-100' : 'opacity-0'} ${imgClassName}`}
+          className={`object-cover transition-opacity duration-700 ${status === 'ready' ? 'opacity-100' : 'opacity-0'} ${imgClassName}`}
         />
       )}
     </div>

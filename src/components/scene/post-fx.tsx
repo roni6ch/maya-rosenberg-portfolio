@@ -33,7 +33,7 @@ export function PostFx({ tier }: PostFxProps) {
 function MidEffects() {
   return (
     <EffectComposer multisampling={0}>
-      <Vignette offset={0.3} darkness={0.6} />
+      <Vignette offset={0.35} darkness={0.22} />
       <SMAA />
     </EffectComposer>
   )
@@ -54,9 +54,9 @@ function HighEffects() {
   return (
     <EffectComposer multisampling={0}>
       <DepthOfField ref={depthOfFieldRef} focusDistance={24} focusRange={BASE_FOCUS_RANGE} bokehScale={BASE_BOKEH} resolutionScale={0.5} />
-      <Bloom mipmapBlur intensity={0.6} luminanceThreshold={0.88} luminanceSmoothing={0.25} radius={0.72} />
-      <Vignette offset={0.28} darkness={0.7} />
-      <Noise blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.18} />
+      <Bloom mipmapBlur intensity={0.28} luminanceThreshold={0.92} luminanceSmoothing={0.3} radius={0.62} />
+      <Vignette offset={0.32} darkness={0.28} />
+      <Noise blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.07} />
       <SMAA />
     </EffectComposer>
   )

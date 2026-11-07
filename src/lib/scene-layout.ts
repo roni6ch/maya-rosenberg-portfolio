@@ -1,4 +1,7 @@
 import { CatmullRomCurve3, MathUtils, Vector3 } from 'three'
+import { EXIT_RUNWAY } from '@/lib/scene-constants'
+
+export { EXIT_RUNWAY }
 
 export type VolumeKind = 'box' | 'cylinder'
 
@@ -17,6 +20,19 @@ export interface VolumeSpec {
   /** intro growth delay (0..1 of the intro) */
   delay: number
   /** spatial chunk index, so each chunk can be frustum-culled on its own */
+  chunk: number
+}
+
+export type PropKind = 'trunk' | 'canopy' | 'hedge' | 'lamp' | 'lampHead' | 'planter' | 'bench' | 'plaza'
+
+/** Landscaping and street furniture (no facade shader — instanced PBR). */
+export interface PropSpec {
+  kind: PropKind
+  position: [number, number, number]
+  size: [number, number, number]
+  rotationY: number
+  tint: string
+  delay: number
   chunk: number
 }
 
@@ -52,10 +68,12 @@ export interface SceneLayout {
   hero: VolumeSpec[]
   /** dense districts either side of the camera spline */
   district: VolumeSpec[]
-  /** tall dark silhouettes far from the path, for depth layering */
+  /** distant limestone silhouettes far from the path, for depth layering */
   skyline: VolumeSpec[]
   /** near columns and slabs that pass close to the camera (depth parallax) */
   foreground: VolumeSpec[]
+  /** trees, hedges, lamps, planters, benches */
+  props: PropSpec[]
   /** structural skeletons as line segments (xyz pairs) */
   frames: Float32Array
   anchors: ProjectAnchor[]
@@ -72,21 +90,20 @@ const LOOK_AHEAD = 0.012
 const FOCUS_AHEAD = 0.04
 const CHUNK_LENGTH = 34
 /** scroll length of the exit after the last project, in project-spacings (keeps the empty tail short) */
-export const EXIT_RUNWAY = 0.4
-
 const TINTS: { color: string; weight: number }[] = [
-  { color: '#6e685f', weight: 0.28 },
-  { color: '#8e8374', weight: 0.2 },
-  { color: '#33363d', weight: 0.2 },
-  { color: '#3c4552', weight: 0.1 },
-  { color: '#a99c85', weight: 0.08 },
-  { color: '#8f4d38', weight: 0.08 },
-  { color: '#5b2b30', weight: 0.04 },
-  { color: '#1d1f24', weight: 0.02 }
+  { color: '#e8e2d6', weight: 0.24 },
+  { color: '#d5cfc4', weight: 0.22 },
+  { color: '#c4bdb0', weight: 0.18 },
+  { color: '#b7aea0', weight: 0.12 },
+  { color: '#a99c85', weight: 0.1 },
+  { color: '#9a8e80', weight: 0.08 },
+  { color: '#c4a882', weight: 0.04 },
+  { color: '#8a7d6e', weight: 0.02 }
 ]
 const TINT_TOTAL = TINTS.reduce((sum, tint) => sum + tint.weight, 0)
-const SKYLINE_TINTS = ['#1b1d23', '#22252c', '#2a2d35', '#181a1f']
-const PLAZA_TINT = '#4b4944'
+const SKYLINE_TINTS = ['#c8c2b6', '#d4cec2', '#b8b1a6', '#e0dacf']
+const PLAZA_TINT = '#cfc8bc'
+const CANOPY_TINTS = ['#7d8a70', '#6f7c64', '#8a9178', '#74826c']
 
 type Random = () => number
 type Vec3 = [number, number, number]
@@ -138,7 +155,7 @@ interface AddVolumeParams {
   delayOffset?: number
 }
 
-function addVolume({ frame, kind = 'box', local, size, tint, windowDensity, emissive = 0.5, delayOffset = 0 }: AddVolumeParams) {
+function addVolume({ frame, kind = 'box', local, size, tint, windowDensity, emissive = 0.08, delayOffset = 0 }: AddVolumeParams) {
   frame.out.push({
     kind,
     position: toWorld({ origin: frame.origin, rotation: frame.rotation, local }),
@@ -162,19 +179,19 @@ function addTower({ frame, width, depth, height }: { frame: Frame; width: number
   const { random } = frame
   const podiumHeight = 0.5 + random() * 0.6
   const shaftTint = pickTint({ random })
-  addVolume({ frame, local: [0, 0, 0], size: [width * 1.45, podiumHeight, depth * 1.45], tint: '#5a554d', windowDensity: 0.3, emissive: 0.25 })
-  addVolume({ frame, local: [0, podiumHeight, 0], size: [width, height, depth], tint: shaftTint, windowDensity: 0.6 + random() * 0.35, emissive: 0.4 + random() * 0.6, delayOffset: 0.04 })
+  addVolume({ frame, local: [0, 0, 0], size: [width * 1.45, podiumHeight, depth * 1.45], tint: '#c8c1b6', windowDensity: 0.22, emissive: 0.04 })
+  addVolume({ frame, local: [0, podiumHeight, 0], size: [width, height, depth], tint: shaftTint, windowDensity: 0.55 + random() * 0.3, emissive: 0.06 + random() * 0.1, delayOffset: 0.04 })
   let top = podiumHeight + height
   const setbacks = random() < 0.65 ? 1 + Math.floor(random() * 2) : 0
   for (let i = 0; i < setbacks; i++) {
     const scale = 0.76 - i * 0.16
     const stepHeight = 0.8 + random() * 1.4
-    addVolume({ frame, local: [0, top, 0], size: [width * scale, stepHeight, depth * scale], tint: '#2b2d33', windowDensity: 0.5, emissive: 0.7, delayOffset: 0.08 })
+    addVolume({ frame, local: [0, top, 0], size: [width * scale, stepHeight, depth * scale], tint: '#d4cec4', windowDensity: 0.45, emissive: 0.08, delayOffset: 0.08 })
     top += stepHeight
   }
   if (height > 6.5 && random() < 0.55) {
     const spire = 1.6 + random() * 2.2
-    addVolume({ frame, kind: 'cylinder', local: [0, top, 0], size: [0.1, spire, 0.1], tint: '#1d1f24', windowDensity: 0, emissive: 0, delayOffset: 0.12 })
+    addVolume({ frame, kind: 'cylinder', local: [0, top, 0], size: [0.1, spire, 0.1], tint: '#a89f93', windowDensity: 0, emissive: 0, delayOffset: 0.12 })
     top += spire
   }
   return { height: top, width }
@@ -185,7 +202,7 @@ function addSlabStack({ frame }: { frame: Frame }) {
   const { random } = frame
   const coreHeight = 3 + random() * 3.4
   const levels = 3 + Math.floor(random() * 3)
-  addVolume({ frame, local: [0, 0, 0], size: [0.9, coreHeight, 0.9], tint: '#3a3b40', windowDensity: 0, emissive: 0 })
+  addVolume({ frame, local: [0, 0, 0], size: [0.9, coreHeight, 0.9], tint: '#c4bdb2', windowDensity: 0, emissive: 0 })
   for (let i = 0; i < levels; i++) {
     const direction = i % 2 === 0 ? 1 : -1
     const width = 3 + random() * 2.4 - i * 0.12
@@ -195,7 +212,7 @@ function addSlabStack({ frame }: { frame: Frame }) {
       size: [width, 0.55, 1.8 + random() * 1.1],
       tint: i % 2 === 0 ? '#a99c85' : '#6e685f',
       windowDensity: 0.9,
-      emissive: 0.5 + random() * 0.4,
+      emissive: 0.08 + random() * 0.08,
       delayOffset: 0.03 * i
     })
   }
@@ -217,8 +234,8 @@ function addPilotis({ frame }: { frame: Frame }) {
   columns.forEach(([cx, cz]) => {
     addVolume({ frame, kind: 'cylinder', local: [cx * (width / 2 - 0.25), 0, cz * (depth / 2 - 0.25)], size: [0.24, lift, 0.24], tint: '#8e8374', windowDensity: 0, emissive: 0 })
   })
-  addVolume({ frame, local: [0, lift, 0], size: [width, height, depth], tint: pickTint({ random }), windowDensity: 0.55 + random() * 0.3, emissive: 0.5 + random() * 0.4, delayOffset: 0.05 })
-  addVolume({ frame, local: [0, lift + height, 0], size: [width * 1.12, 0.14, depth * 1.12], tint: '#1d1f24', windowDensity: 0, emissive: 0, delayOffset: 0.07 })
+  addVolume({ frame, local: [0, lift, 0], size: [width, height, depth], tint: pickTint({ random }), windowDensity: 0.55 + random() * 0.3, emissive: 0.08 + random() * 0.08, delayOffset: 0.05 })
+  addVolume({ frame, local: [0, lift + height, 0], size: [width * 1.12, 0.14, depth * 1.12], tint: '#c4bdb2', windowDensity: 0, emissive: 0, delayOffset: 0.07 })
 }
 
 /** A round tower with a projecting ring slab. */
@@ -226,9 +243,9 @@ function addCylinderTower({ frame }: { frame: Frame }) {
   const { random } = frame
   const diameter = 1.5 + random() * 1.3
   const height = 3.5 + random() * 5
-  addVolume({ frame, kind: 'cylinder', local: [0, 0, 0], size: [diameter, height, diameter], tint: pickTint({ random }), windowDensity: 0.6 + random() * 0.3, emissive: 0.5 + random() * 0.5 })
+  addVolume({ frame, kind: 'cylinder', local: [0, 0, 0], size: [diameter, height, diameter], tint: pickTint({ random }), windowDensity: 0.55 + random() * 0.25, emissive: 0.08 + random() * 0.08 })
   addVolume({ frame, kind: 'cylinder', local: [0, height * (0.45 + random() * 0.2), 0], size: [diameter * 1.35, 0.14, diameter * 1.35], tint: '#a99c85', windowDensity: 0, emissive: 0, delayOffset: 0.05 })
-  addVolume({ frame, kind: 'cylinder', local: [0, height, 0], size: [diameter * 0.7, 0.9, diameter * 0.7], tint: '#2b2d33', windowDensity: 0.5, emissive: 0.7, delayOffset: 0.08 })
+  addVolume({ frame, kind: 'cylinder', local: [0, height, 0], size: [diameter * 0.7, 0.9, diameter * 0.7], tint: '#d4cec4', windowDensity: 0.45, emissive: 0.08, delayOffset: 0.08 })
 }
 
 /** Stepped terraces climbing in one direction. */
@@ -239,7 +256,7 @@ function addTerrace({ frame }: { frame: Frame }) {
   const depth = 2 + random() * 1.2
   const tint = pickTint({ random })
   for (let i = 0; i < steps; i++) {
-    addVolume({ frame, local: [i * 0.28, i * 0.7, 0], size: [width - i * 0.45, 0.7, depth], tint: i % 2 === 0 ? tint : '#8e8374', windowDensity: 0.45, emissive: 0.45, delayOffset: i * 0.02 })
+    addVolume({ frame, local: [i * 0.28, i * 0.7, 0], size: [width - i * 0.45, 0.7, depth], tint: i % 2 === 0 ? tint : '#8e8374', windowDensity: 0.45, emissive: 0.08, delayOffset: i * 0.02 })
   }
 }
 
@@ -249,8 +266,61 @@ function addCourtBlock({ frame }: { frame: Frame }) {
   const tint = pickTint({ random })
   const height = 0.9 + random() * 1.8
   const length = 2.6 + random() * 1.8
-  addVolume({ frame, local: [0, 0, 0], size: [length, height, 1.1], tint, windowDensity: 0.55, emissive: 0.4 })
-  addVolume({ frame, local: [-length / 2 + 0.55, 0, 1.1], size: [1.1, height * (0.7 + random() * 0.3), length * 0.6], tint, windowDensity: 0.55, emissive: 0.4, delayOffset: 0.03 })
+  addVolume({ frame, local: [0, 0, 0], size: [length, height, 1.1], tint, windowDensity: 0.5, emissive: 0.08 })
+  addVolume({ frame, local: [-length / 2 + 0.55, 0, 1.1], size: [1.1, height * (0.7 + random() * 0.3), length * 0.6], tint, windowDensity: 0.5, emissive: 0.08, delayOffset: 0.03 })
+}
+
+/** White-plaster villa with a floating roof slab and a small terrace. */
+function addVilla({ frame }: { frame: Frame }) {
+  const { random } = frame
+  const width = 2.2 + random() * 1.6
+  const depth = 1.8 + random() * 1.3
+  const height = 0.85 + random() * 0.75
+  const wall = random() < 0.5 ? '#e6e0d6' : '#d5cfc4'
+  addVolume({ frame, local: [0, 0, 0], size: [width, height, depth], tint: wall, windowDensity: 0.42 + random() * 0.2, emissive: 0.06 })
+  addVolume({ frame, local: [0.08, height, 0], size: [width * 1.08, 0.1, depth * 1.08], tint: '#b9b1a4', windowDensity: 0, emissive: 0, delayOffset: 0.04 })
+  if (random() < 0.55)
+    addVolume({ frame, local: [width * 0.35, 0, depth * 0.45], size: [width * 0.45, 0.06, depth * 0.55], tint: '#cfc8bc', windowDensity: 0, emissive: 0, delayOffset: 0.05 })
+}
+
+/** Four slender columns carrying a thin roof — garden pergola. */
+function addPergola({ frame }: { frame: Frame }) {
+  const { random } = frame
+  const width = 2 + random() * 1.2
+  const depth = 1.4 + random() * 0.8
+  const lift = 1.2 + random() * 0.3
+  const columns: [number, number][] = [
+    [-1, -1],
+    [1, -1],
+    [-1, 1],
+    [1, 1]
+  ]
+  columns.forEach(([cx, cz]) => {
+    addVolume({ frame, kind: 'cylinder', local: [cx * (width / 2 - 0.12), 0, cz * (depth / 2 - 0.12)], size: [0.12, lift, 0.12], tint: '#cfc6b8', windowDensity: 0, emissive: 0 })
+  })
+  addVolume({ frame, local: [0, lift, 0], size: [width, 0.08, depth], tint: '#d8d1c4', windowDensity: 0, emissive: 0, delayOffset: 0.04 })
+}
+
+/** Colonnade: a short run of columns carrying a limestone beam. */
+function addArcade({ frame }: { frame: Frame }) {
+  const { random } = frame
+  const bays = 3 + Math.floor(random() * 2)
+  const bayW = 0.7 + random() * 0.2
+  const height = 1.4 + random() * 0.6
+  const depth = 1.1 + random() * 0.4
+  for (let i = 0; i <= bays; i++) {
+    addVolume({
+      frame,
+      kind: 'cylinder',
+      local: [-bays * bayW * 0.5 + i * bayW, 0, 0],
+      size: [0.16, height, 0.16],
+      tint: '#d2cbc0',
+      windowDensity: 0,
+      emissive: 0,
+      delayOffset: i * 0.01
+    })
+  }
+  addVolume({ frame, local: [0, height, 0], size: [bays * bayW + 0.4, 0.16, depth], tint: '#c4bdb2', windowDensity: 0, emissive: 0, delayOffset: 0.06 })
 }
 
 interface AddFrameLinesParams {
@@ -300,7 +370,7 @@ function buildHero({ random, lines }: BuildHeroParams) {
     position: [0, 0, -2.5],
     size: [30, 0.12, 25],
     rotationY: 0,
-    tint: '#1f2024',
+    tint: '#d0c9be',
     windowDensity: 0,
     emissive: 0,
     delay: 0.02,
@@ -315,26 +385,31 @@ function buildHero({ random, lines }: BuildHeroParams) {
       const distance = Math.hypot(x, z)
       const frame: Frame = { random, out, origin: [x, 0.12, z], rotation: 0, chunk: 0, delay: MathUtils.clamp(0.04 + distance * 0.03, 0, 0.5) }
       const roll = random()
-      if (roll < 0.1) continue
-      if (roll < 0.17) {
+      if (roll < 0.07) continue
+      if (roll < 0.15) {
         addVolume({ frame, local: [0, 0, 0], size: [1.8 + random() * 0.8, 0.06, 1.8 + random() * 0.8], tint: PLAZA_TINT, windowDensity: 0, emissive: 0 })
         continue
       }
-      if (roll < 0.25) {
+      if (roll < 0.22) {
         addFrameLines({ lines, origin: frame.origin, rotation: 0, size: [1.8 + random() * 0.8, 3 + random() * 5, 1.6 + random() * 0.8], columns: 2, rows: 2, levels: 4 + Math.floor(random() * 4) })
         continue
       }
-      if (roll < 0.5) {
-        const height = random() < 0.35 ? 5.5 + random() * 5.5 : 2 + Math.pow(random(), 1.4) * 3.2
+      if (roll < 0.4) {
+        addVilla({ frame })
+        continue
+      }
+      if (roll < 0.52) {
+        const height = random() < 0.28 ? 5.5 + random() * 5.5 : 2 + Math.pow(random(), 1.4) * 3.2
         const result = addTower({ frame, width: 0.9 + random() * 0.9, depth: 0.9 + random() * 0.9, height })
         towers.push({ position: [x, 0.12, z], height: result.height })
         continue
       }
       if (roll < 0.62) addSlabStack({ frame })
-      else if (roll < 0.74) addPilotis({ frame })
-      else if (roll < 0.83) addCylinderTower({ frame })
-      else if (roll < 0.92) addTerrace({ frame })
-      else addCourtBlock({ frame })
+      else if (roll < 0.72) addPilotis({ frame })
+      else if (roll < 0.8) addPergola({ frame })
+      else if (roll < 0.88) addTerrace({ frame })
+      else if (roll < 0.94) addCourtBlock({ frame })
+      else addArcade({ frame })
     }
   }
 
@@ -362,7 +437,7 @@ function addBridges({ random, out, towers }: { random: Random; out: VolumeSpec[]
         rotationY: Math.atan2(dx, dz),
         tint: '#a99c85',
         windowDensity: 0.9,
-        emissive: 0.8,
+        emissive: 0.12,
         delay: 0.55,
         chunk: 0
       })
@@ -438,6 +513,7 @@ export function buildSceneLayout({ projectCount }: BuildSceneLayoutParams): Scen
   const skyline = buildSkyline({ random, curve, length })
   const foreground = buildForeground({ random, curve, length, anchors })
   const hero = buildHero({ random, lines })
+  const props = buildProps({ random, curve, length, isBlocked })
 
   const knotsP = [0, ...anchors.map((anchor) => anchor.stop), 1]
   const knotsU = [0, ...anchors.map((anchor) => anchor.u), 1]
@@ -470,7 +546,7 @@ export function buildSceneLayout({ projectCount }: BuildSceneLayoutParams): Scen
     focusOut.lerp(target, Math.min(1, pull * 1.4))
   }
 
-  return { curve, length, hero, district, skyline, foreground, frames: new Float32Array(lines), anchors, mapProgressToU, getLookTarget }
+  return { curve, length, hero, district, skyline, foreground, props, frames: new Float32Array(lines), anchors, mapProgressToU, getLookTarget }
 }
 
 interface BuildAlongPathParams {
@@ -490,7 +566,7 @@ function buildDistrict({ random, curve, length, lines, isBlocked }: BuildDistric
   const point = new Vector3()
   const tangent = new Vector3()
   const right = new Vector3()
-  for (let distance = 14; distance < length - 4; distance += 2.5) {
+  for (let distance = 14; distance < length - 4; distance += 2.2) {
     const u = distance / length
     curve.getPointAt(u, point)
     curve.getTangentAt(u, tangent).normalize()
@@ -499,7 +575,7 @@ function buildDistrict({ random, curve, length, lines, isBlocked }: BuildDistric
     const heading = Math.atan2(tangent.x, tangent.z)
     for (const side of [-1, 1]) {
       for (let layer = 0; layer < 2; layer++) {
-        if (random() < 0.15) continue
+        if (random() < 0.1) continue
         const lateral = (layer === 0 ? 6 + random() * 4 : 12.5 + random() * 9) * side
         const x = point.x + right.x * lateral
         const z = point.z + right.z * lateral
@@ -507,14 +583,16 @@ function buildDistrict({ random, curve, length, lines, isBlocked }: BuildDistric
         const frame: Frame = { random, out, origin: [x, 0, z], rotation: heading + (random() - 0.5) * 0.3, chunk, delay: 0.5 + random() * 0.3 }
         const roll = random()
         const lift = layer === 0 ? 1 : 1.5
-        if (roll < 0.07) {
+        if (roll < 0.06) {
           addFrameLines({ lines, origin: frame.origin, rotation: frame.rotation, size: [2 + random() * 2, (3 + random() * 6) * lift, 2 + random() * 1.6], columns: 2, rows: 2, levels: 4 + Math.floor(random() * 4) })
-        } else if (roll < 0.4) addTower({ frame, width: 1 + random() * 1.6, depth: 1 + random() * 1.6, height: (2.5 + Math.pow(random(), 1.7) * 9) * lift })
-        else if (roll < 0.52) addSlabStack({ frame })
-        else if (roll < 0.63) addPilotis({ frame })
-        else if (roll < 0.74) addCylinderTower({ frame })
-        else if (roll < 0.86) addTerrace({ frame })
-        else addCourtBlock({ frame })
+        } else if (roll < 0.3) addVilla({ frame })
+        else if (roll < 0.46) addTower({ frame, width: 1 + random() * 1.6, depth: 1 + random() * 1.6, height: (2.5 + Math.pow(random(), 1.7) * 9) * lift })
+        else if (roll < 0.56) addSlabStack({ frame })
+        else if (roll < 0.66) addPilotis({ frame })
+        else if (roll < 0.74) addTerrace({ frame })
+        else if (roll < 0.82) addCourtBlock({ frame })
+        else if (roll < 0.9) addPergola({ frame })
+        else addArcade({ frame })
       }
     }
   }
@@ -535,8 +613,8 @@ function buildSkyline({ random, curve, length }: BuildAlongPathParams) {
       size: [width, 16 + Math.pow(random(), 1.8) * 46, 4 + random() * 6],
       rotationY: random() * Math.PI,
       tint: SKYLINE_TINTS[Math.floor(random() * SKYLINE_TINTS.length)],
-      windowDensity: 0.4,
-      emissive: 0.35 + random() * 0.3,
+      windowDensity: 0.22,
+      emissive: 0.04,
       delay: 0.6 + random() * 0.3,
       chunk
     })
@@ -593,7 +671,7 @@ function buildForeground({ random, curve, length, anchors }: BuildForegroundPara
     const delay = 0.55 + random() * 0.2
     if (random() < 0.62) {
       const diameter = 0.3 + random() * 0.35
-      out.push({ kind: 'cylinder', position: [x, 0, z], size: [diameter, 3.5 + random() * 8, diameter], rotationY: 0, tint: random() < 0.5 ? '#8e8374' : '#33363d', windowDensity: 0, emissive: 0, delay, chunk })
+      out.push({ kind: 'cylinder', position: [x, 0, z], size: [diameter, 3.5 + random() * 8, diameter], rotationY: 0, tint: random() < 0.5 ? '#c4bdb2' : '#a99c85', windowDensity: 0, emissive: 0, delay, chunk })
       continue
     }
     out.push({
@@ -608,5 +686,135 @@ function buildForeground({ random, curve, length, anchors }: BuildForegroundPara
       chunk
     })
   }
+  return out
+}
+
+interface BuildPropsParams {
+  random: Random
+  curve: CatmullRomCurve3
+  length: number
+  isBlocked: (params: { x: number; z: number; radius: number }) => boolean
+}
+
+function pickCanopy({ random }: { random: Random }) {
+  return CANOPY_TINTS[Math.floor(random() * CANOPY_TINTS.length)]
+}
+
+function addTree({ out, x, z, random, delay, chunk, heading = 0 }: { out: PropSpec[]; x: number; z: number; random: Random; delay: number; chunk: number; heading?: number }) {
+  const trunkH = 1.05 + random() * 0.9
+  const canopyR = 0.85 + random() * 0.75
+  out.push({ kind: 'trunk', position: [x, 0, z], size: [0.14 + random() * 0.08, trunkH, 0.14 + random() * 0.08], rotationY: heading, tint: '#6b5c4c', delay, chunk })
+  out.push({
+    kind: 'canopy',
+    position: [x, trunkH + canopyR * 0.32, z],
+    size: [canopyR, canopyR * 0.82, canopyR],
+    rotationY: heading,
+    tint: pickCanopy({ random }),
+    delay: delay + 0.04,
+    chunk
+  })
+}
+
+/** Olive trees, hedges, limestone planters, benches and street lamps along the spline and in the hero plaza. */
+function buildProps({ random, curve, length, isBlocked }: BuildPropsParams) {
+  const out: PropSpec[] = []
+  const point = new Vector3()
+  const tangent = new Vector3()
+  const right = new Vector3()
+
+  for (let distance = 6; distance < length - 2; distance += 5.1) {
+    const u = distance / length
+    curve.getPointAt(u, point)
+    curve.getTangentAt(u, tangent).normalize()
+    right.crossVectors(tangent, UP).normalize()
+    const heading = Math.atan2(tangent.x, tangent.z)
+    const chunk = Math.floor(distance / CHUNK_LENGTH)
+    for (const side of [-1, 1]) {
+      const lateral = 2.08 * side
+      const x = point.x + right.x * lateral
+      const z = point.z + right.z * lateral
+      if (isBlocked({ x, z, radius: 3.2 })) continue
+      const delay = 0.38 + random() * 0.22
+      const poleH = 2.45 + random() * 0.35
+      out.push({ kind: 'lamp', position: [x, 0, z], size: [0.07, poleH, 0.07], rotationY: heading, tint: '#8a8176', delay, chunk })
+      out.push({ kind: 'lampHead', position: [x, poleH, z], size: [0.18, 0.18, 0.18], rotationY: 0, tint: '#f0d7a8', delay: delay + 0.04, chunk })
+    }
+  }
+
+  for (let distance = 5; distance < length; distance += 3.2) {
+    const u = distance / length
+    curve.getPointAt(u, point)
+    curve.getTangentAt(u, tangent).normalize()
+    right.crossVectors(tangent, UP).normalize()
+    const heading = Math.atan2(tangent.x, tangent.z)
+    const chunk = Math.floor(distance / CHUNK_LENGTH)
+    for (const side of [-1, 1]) {
+      for (let layer = 0; layer < 2; layer++) {
+        if (random() < 0.28) continue
+        const lateral = (layer === 0 ? 6.8 + random() * 4.2 : 13 + random() * 8) * side
+        const x = point.x + right.x * lateral
+        const z = point.z + right.z * lateral
+        if (isBlocked({ x, z, radius: layer === 0 ? 6 : 5 })) continue
+        const delay = 0.42 + random() * 0.28
+        if (random() < 0.18) {
+          out.push({
+            kind: 'hedge',
+            position: [x, 0, z],
+            size: [1.6 + random() * 1.4, 0.45 + random() * 0.35, 0.45 + random() * 0.25],
+            rotationY: heading + (random() - 0.5) * 0.4,
+            tint: '#6f7c64',
+            delay,
+            chunk
+          })
+          continue
+        }
+        addTree({ out, x, z, random, delay, chunk, heading })
+        if (random() < 0.22)
+          out.push({ kind: 'planter', position: [x, 0, z], size: [0.7 + random() * 0.3, 0.18, 0.7 + random() * 0.3], rotationY: heading, tint: '#c4bdb2', delay, chunk })
+      }
+    }
+  }
+
+  for (let distance = 10; distance < length - 6; distance += 9) {
+    const u = distance / length
+    curve.getPointAt(u, point)
+    curve.getTangentAt(u, tangent).normalize()
+    right.crossVectors(tangent, UP).normalize()
+    const heading = Math.atan2(tangent.x, tangent.z)
+    const chunk = Math.floor(distance / CHUNK_LENGTH)
+    const side = random() < 0.5 ? -1 : 1
+    const lateral = (3.4 + random() * 1.4) * side
+    const x = point.x + right.x * lateral
+    const z = point.z + right.z * lateral
+    if (isBlocked({ x, z, radius: 4 })) continue
+    out.push({
+      kind: 'bench',
+      position: [x, 0, z],
+      size: [1.15, 0.22, 0.38],
+      rotationY: heading + Math.PI / 2,
+      tint: '#cfc6b8',
+      delay: 0.5 + random() * 0.2,
+      chunk
+    })
+  }
+
+  const cell = 2.4
+  for (let ix = -5; ix <= 5; ix++) {
+    for (let iz = -5; iz <= 3; iz++) {
+      if (random() > 0.22) continue
+      const x = ix * cell + (random() - 0.5) * 0.5
+      const z = iz * cell + (random() - 0.5) * 0.5
+      if (Math.abs(x) < 2.8) continue
+      if (isBlocked({ x, z, radius: 3 })) continue
+      const delay = 0.08 + Math.hypot(x, z) * 0.03
+      if (random() < 0.35) {
+        out.push({ kind: 'plaza', position: [x, 0.02, z], size: [1.6 + random() * 0.8, 0.04, 1.6 + random() * 0.8], rotationY: 0, tint: PLAZA_TINT, delay, chunk: 0 })
+        addTree({ out, x, z, random, delay: delay + 0.05, chunk: 0 })
+        continue
+      }
+      addTree({ out, x, z, random, delay, chunk: 0 })
+    }
+  }
+
   return out
 }

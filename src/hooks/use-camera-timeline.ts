@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { EXIT_RUNWAY } from '@/lib/scene-layout'
+import { EXIT_RUNWAY } from '@/lib/scene-constants'
 import type { SceneLayout } from '@/lib/scene-layout'
 import { sceneState } from '@/lib/scene-state'
 

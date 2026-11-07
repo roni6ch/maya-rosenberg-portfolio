@@ -29,7 +29,7 @@ export function Ground({ receiveShadow }: GroundProps) {
   return (
     <mesh ref={meshRef} rotation-x={-Math.PI / 2} receiveShadow={receiveShadow}>
       <planeGeometry args={[520, 520]} />
-      <meshStandardMaterial color="#101116" roughness={0.9} metalness={0.05} />
+      <meshStandardMaterial color="#c9c3b6" roughness={0.92} metalness={0.04} />
     </mesh>
   )
 }
@@ -90,10 +90,10 @@ export function Pathway({ layout, receiveShadow }: PathwayProps) {
   return (
     <group>
       <mesh geometry={ribbon} receiveShadow={receiveShadow} frustumCulled={false}>
-        <meshStandardMaterial color="#17181d" roughness={0.32} metalness={0.25} />
+        <meshStandardMaterial color="#b9b3a6" roughness={0.55} metalness={0.08} />
       </mesh>
       <lineSegments geometry={edges} frustumCulled={false}>
-        <lineBasicMaterial color="#c79a64" transparent opacity={0.3} toneMapped={false} />
+        <lineBasicMaterial color="#d4c4a8" transparent opacity={0.45} toneMapped={false} />
       </lineSegments>
     </group>
   )
@@ -122,7 +122,7 @@ export function StructuralFrames({ frames }: StructuralFramesProps) {
 
   return (
     <lineSegments geometry={geometry} frustumCulled={false}>
-      <lineBasicMaterial ref={materialRef} color="#efcfa4" transparent opacity={0} toneMapped={false} depthWrite={false} />
+      <lineBasicMaterial ref={materialRef} color="#a89478" transparent opacity={0} toneMapped={false} depthWrite={false} />
     </lineSegments>
   )
 }

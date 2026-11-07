@@ -11,7 +11,7 @@ export function ProjectIndex({ projects }: ProjectIndexProps) {
   return (
     <section
       id="projects"
-      className="relative rounded-t-[2rem] bg-paper px-6 py-28 shadow-[0_-40px_60px_-25px_rgba(0,0,0,0.5)] md:rounded-t-[4rem] md:px-12 md:py-44"
+      className="relative z-[2] rounded-t-[2rem] bg-paper px-6 py-28 shadow-[0_-32px_50px_-28px_rgba(70,62,52,0.18)] md:rounded-t-[4rem] md:px-12 md:py-44"
     >
       <RiseGroup className="mx-auto max-w-[110rem]">
         <div className="mb-16 flex items-end justify-between md:mb-20">
@@ -38,7 +38,7 @@ export function ProjectIndex({ projects }: ProjectIndexProps) {
                   location={project.location}
                   year={project.year}
                   variant={layout.variant}
-                  cover={{ full: project.cover.full, large: project.cover.large, thumb: project.cover.thumb, width: project.cover.width, height: project.cover.height }}
+                  cover={{ large: project.cover.large, thumb: project.cover.thumb, width: project.cover.width, height: project.cover.height }}
                 />
               </div>
             )

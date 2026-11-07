@@ -13,7 +13,7 @@ interface ProjectCardProps {
   location: string
   year: string
   variant: ProjectCardVariant
-  cover: Pick<RemoteImage, 'full' | 'large' | 'thumb' | 'width' | 'height'>
+  cover: Pick<RemoteImage, 'large' | 'thumb' | 'width' | 'height'>
 }
 
 const VARIANT_RATIO: Record<ProjectCardVariant, { width: number; height: number }> = {
@@ -37,11 +37,12 @@ export function ProjectCard({ id, index, title, location, year, variant, cover }
       <div className="relative overflow-hidden">
         <RemoteImg
           rise
-          src={cover.full}
-          thumb={cover.large}
+          src={cover.large}
+          thumb={cover.thumb}
           alt={title}
           width={ratio.width}
           height={ratio.height}
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 640px"
           className="transition-transform duration-[1400ms] ease-out group-hover:scale-[1.035]"
         />
         <span

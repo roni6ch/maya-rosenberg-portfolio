@@ -64,7 +64,7 @@ export function ProjectOverlay({ projects }: ProjectOverlayProps) {
         <button
           type="button"
           onClick={() => openProject({ id: project.id })}
-          className="pointer-events-auto mt-7 inline-flex items-center gap-4 text-[10px] font-light uppercase tracking-[0.4em] text-bone"
+          className="pointer-events-auto mt-7 inline-flex min-h-11 items-center gap-4 text-[10px] font-light uppercase tracking-[0.4em] text-bone"
         >
           <span className="h-px w-10 bg-bone transition-all duration-500 hover:w-16" />
           View project

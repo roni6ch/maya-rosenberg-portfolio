@@ -10,7 +10,7 @@ export function PressSection({ content }: PressSectionProps) {
   if (!content.pressItems.length) return null
 
   return (
-    <section id="press" className="border-t border-ink/10 bg-paper px-6 py-28 md:px-12 md:py-40">
+    <section id="press" className="relative z-[2] border-t border-ink/10 bg-paper px-6 py-28 md:px-12 md:py-40">
       <div className="mx-auto max-w-[110rem]">
         <h2 className="mb-16 text-[clamp(1.6rem,4vw,3.2rem)] font-extralight uppercase tracking-[0.2em] md:mb-24">Press</h2>
         <RevealGroup className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 xl:grid-cols-5">
@@ -41,11 +41,12 @@ function PressCard({ item, index }: PressCardProps) {
     >
       <RemoteImg
         reveal
-        src={image.full}
+        src={image.large}
         thumb={image.thumb}
         alt={image.alt || `${outlet} press feature`}
         width={image.width}
         height={image.height}
+        sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 220px"
         className="transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
       />
       <div className="mt-5 flex items-center justify-between gap-3">

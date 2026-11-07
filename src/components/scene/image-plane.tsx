@@ -19,7 +19,7 @@ interface ImagePlaneProps {
   phase: number
 }
 
-const FALLBACK_COLOR = '#2a2b31'
+const FALLBACK_COLOR = '#cfc8bc'
 /** warm hairline border around each photo, in world units */
 const FRAME_PADDING = 0.06
 const FRAME_OPACITY = 0.7

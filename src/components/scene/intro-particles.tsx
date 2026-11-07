@@ -128,7 +128,7 @@ export function IntroParticles({ boxes, count }: IntroParticlesProps) {
         uPixelRatio: { value: 1 },
         uMouse: { value: new Vector3() },
         uMouseStrength: { value: 0 },
-        uColor: { value: new Color('#ffcf9a') }
+        uColor: { value: new Color('#f4ead8') }
       }
     })
     return { geometry: buffer, material: shader }

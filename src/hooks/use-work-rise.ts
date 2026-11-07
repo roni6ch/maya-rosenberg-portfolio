@@ -27,12 +27,13 @@ const CLIP_OPEN = 'inset(0% 0% 0% 0%)'
 
 interface UseWorkRiseParams {
   rootRef: RefObject<HTMLElement>
+  enabled?: boolean
 }
 
-export function useWorkRise({ rootRef }: UseWorkRiseParams) {
+export function useWorkRise({ rootRef, enabled = true }: UseWorkRiseParams) {
   useEffect(() => {
     const root = rootRef.current
-    if (!root) return
+    if (!root || !enabled) return
     gsap.registerPlugin(ScrollTrigger)
 
     const mm = gsap.matchMedia(root)
@@ -43,7 +44,7 @@ export function useWorkRise({ rootRef }: UseWorkRiseParams) {
 
     ScrollTrigger.refresh()
     return () => mm.revert()
-  }, [rootRef])
+  }, [rootRef, enabled])
 }
 
 function setupCard({ card }: { card: HTMLElement }) {

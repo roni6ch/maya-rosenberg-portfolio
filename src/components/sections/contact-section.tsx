@@ -9,7 +9,7 @@ interface ContactSectionProps {
 export function ContactSection({ content }: ContactSectionProps) {
   const { contact } = content
   return (
-    <section id="contact" className="border-t border-ink/10 bg-paper px-6 py-28 text-ink md:px-12 md:py-44">
+    <section id="contact" className="relative z-[2] border-t border-ink/10 bg-paper px-6 py-28 text-ink md:px-12 md:py-44">
       <div className="mx-auto grid max-w-[110rem] gap-20 md:grid-cols-12">
         <div className="md:col-span-7">
           <p className="text-[10px] font-light uppercase tracking-[0.5em] text-mist">Contact me</p>

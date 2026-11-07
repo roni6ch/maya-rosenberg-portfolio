@@ -36,13 +36,13 @@ export function Loader() {
   if (isHidden) return null
 
   return (
-    <div ref={rootRef} className="fixed inset-0 z-50 grid place-items-center bg-night" role="status" aria-label="Loading">
+    <div ref={rootRef} className="fixed inset-0 z-50 grid place-items-center bg-paper" role="status" aria-label="Loading">
       <div ref={contentRef} className="flex flex-col items-center gap-6">
-        <p className="text-[11px] font-extralight uppercase tracking-[0.5em] text-bone">Maya Rosenberg</p>
-        <div className="relative h-px w-40 overflow-hidden bg-bone/15">
-          <div className="loader-line absolute inset-y-0 left-0 w-full bg-bone" />
+        <p className="text-[11px] font-extralight uppercase tracking-[0.5em] text-ink">Maya Rosenberg</p>
+        <div className="relative h-px w-40 overflow-hidden bg-ink/10">
+          <div className="loader-line absolute inset-y-0 left-0 w-full bg-ink" />
         </div>
-        <p className="text-[10px] font-extralight uppercase tracking-[0.4em] text-bone/50">Architect</p>
+        <p className="text-[10px] font-extralight uppercase tracking-[0.4em] text-ink/45">Architect</p>
       </div>
     </div>
   )

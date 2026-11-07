@@ -1,10 +1,36 @@
 import { useSyncExternalStore } from 'react'
-import { gsap } from 'gsap'
-import { Vector3 } from 'three'
 import type { Object3D } from 'three'
 import type Lenis from 'lenis'
 
-export const SCENE_BACKGROUND = '#0a0b0e'
+export const SCENE_BACKGROUND = '#d4cfc4'
+
+interface MutableVec3 {
+  x: number
+  y: number
+  z: number
+  copy(v: { x: number; y: number; z: number }): MutableVec3
+  lerp(v: { x: number; y: number; z: number }, alpha: number): MutableVec3
+}
+
+function createMutableVec3(x: number, y: number, z: number): MutableVec3 {
+  return {
+    x,
+    y,
+    z,
+    copy(v) {
+      this.x = v.x
+      this.y = v.y
+      this.z = v.z
+      return this
+    },
+    lerp(v, alpha) {
+      this.x += (v.x - this.x) * alpha
+      this.y += (v.y - this.y) * alpha
+      this.z += (v.z - this.z) * alpha
+      return this
+    }
+  }
+}
 
 /** Mutable per-frame state, read by the render loop (never triggers React renders). */
 export const sceneState = {
@@ -19,15 +45,16 @@ export const sceneState = {
   /** smoothed camera travel speed, 0 (dwelling) .. 1 (full fly-through) */
   velocity: 0,
   /** world-space point the camera looks at (also where the key light and focus follow) */
-  cameraTarget: new Vector3(0, 3, 0),
+  cameraTarget: createMutableVec3(0, 3, 0),
   /** world distance from the camera to the plane of focus (drives depth of field) */
   focusDistance: 24,
   pointer: { x: 0, y: 0 },
   pointerActive: false,
   isTouch: false,
+  isCompact: false,
   reducedMotion: false,
   /** raycast hit point on the architectural volumes (world space) */
-  hit: new Vector3(0, 2, 0),
+  hit: createMutableVec3(0, 2, 0),
   hitStrength: 0,
   proxies: new Set<Object3D>(),
   /** 0..1, lowered by the PerformanceMonitor to shed particles */
@@ -96,7 +123,9 @@ export function startIntro({ duration = 4.4 }: StartIntroParams = {}) {
     emit()
   }
   if (sceneState.reducedMotion) return finish()
-  gsap.to(sceneState, { intro: 1, duration, ease: 'power2.inOut', onComplete: finish })
+  void import('gsap').then(({ gsap }) => {
+    gsap.to(sceneState, { intro: 1, duration, ease: 'power2.inOut', onComplete: finish })
+  })
 }
 
 export function useActiveIndex() {

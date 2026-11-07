@@ -14,8 +14,10 @@ import { PointerProbe } from './pointer-probe'
 import { PostFx } from './post-fx'
 import type { QualityTier } from './post-fx'
 import { ProjectPlanes } from './project-planes'
+import { Landscape } from './landscape'
 import { Ground, Pathway, StructuralFrames } from './scene-ground'
-import { HorizonGlow, KeyLight, SceneLights } from './scene-lighting'
+import { HorizonGlow, KeyLight, SceneLights, SunDisc } from './scene-lighting'
+import { SnakePath } from './snake-path'
 import { Volumes } from './volumes'
 
 interface SceneCanvasProps {
@@ -24,8 +26,8 @@ interface SceneCanvasProps {
 
 const PARTICLES_DESKTOP = 9000
 const PARTICLES_MOBILE = 3500
-const FOG_COLOR = '#14151b'
-const FOG_DENSITY = 0.012
+const FOG_COLOR = '#d0cbc0'
+const FOG_DENSITY = 0.0075
 
 const TIER_ORDER: QualityTier[] = ['high', 'mid', 'low']
 const TIER_DPR: Record<QualityTier, [number, number]> = { high: [1, 1.75], mid: [1, 1.5], low: [1, 1.15] }
@@ -42,8 +44,13 @@ export default function SceneCanvas({ projects }: SceneCanvasProps) {
   const initialTier: QualityTier = isCompact ? 'mid' : 'high'
   const { tier, stepDown, stepUp } = useQualityTier({ initialTier })
   const particleCount = isCompact ? PARTICLES_MOBILE : PARTICLES_DESKTOP
+  const landscape = useMemo(() => (isCompact ? layout.props.filter((_, index) => index % 2 === 0) : layout.props), [isCompact, layout.props])
 
   useCameraTimeline({ layout })
+
+  useEffect(() => {
+    sceneState.isCompact = isCompact
+  }, [isCompact])
 
   // the render loop (which publishes the active project) is paused off-journey, so clear it explicitly
   useEffect(() => {
@@ -60,7 +67,7 @@ export default function SceneCanvas({ projects }: SceneCanvasProps) {
         dpr={TIER_DPR[tier]}
         shadows="soft"
         frameloop={isVisible ? 'always' : 'never'}
-        camera={{ fov: 42, near: 0.1, far: 240, position: [7, 13, 46] }}
+        camera={{ fov: isCompact ? 50 : 42, near: 0.1, far: 240, position: [7, 13, 46] }}
         gl={{ antialias: true, powerPreference: 'high-performance', toneMapping: NoToneMapping }}
       >
         <PerformanceMonitor onDecline={stepDown} onIncline={stepUp} flipflops={3} onFallback={stepDown} />
@@ -70,6 +77,7 @@ export default function SceneCanvas({ projects }: SceneCanvasProps) {
         <Suspense fallback={null}>
           <SceneLights />
           <KeyLight castShadow={tier !== 'low'} />
+          <SunDisc visible={tier === 'high'} />
           <HorizonGlow />
           <Ground receiveShadow />
           <Grid
@@ -78,19 +86,21 @@ export default function SceneCanvas({ projects }: SceneCanvasProps) {
             infiniteGrid
             cellSize={1.2}
             sectionSize={6}
-            cellThickness={0.5}
-            sectionThickness={0.9}
-            cellColor="#2b2e37"
-            sectionColor="#4a4e5c"
+            cellThickness={0.45}
+            sectionThickness={0.8}
+            cellColor="#b5aea2"
+            sectionColor="#a89f92"
             fadeDistance={80}
             fadeStrength={1.6}
           />
           <Pathway layout={layout} receiveShadow />
+          <SnakePath layout={layout} />
           <StructuralFrames frames={layout.frames} />
           <Volumes volumes={layout.hero} tilt interactive segments={8} />
           <Volumes volumes={layout.district} interactive segments={4} />
           <Volumes volumes={layout.foreground} segments={1} />
           <Volumes volumes={layout.skyline} segments={1} castShadow={false} receiveShadow={false} />
+          <Landscape props={landscape} castShadow={tier !== 'low'} />
           <IntroParticles boxes={particleBoxes} count={particleCount} />
           <ProjectPlanes projects={projects} layout={layout} />
         </Suspense>

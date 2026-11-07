@@ -7,7 +7,7 @@ import { BackSide, Color } from 'three'
 import type { DirectionalLight, Mesh } from 'three'
 import { sceneState } from '@/lib/scene-state'
 
-const KEY_OFFSET = { x: -15, y: 16, z: 10 }
+const KEY_OFFSET = { x: -22, y: 28, z: 16 }
 const SHADOW_EXTENT = 38
 const SHADOW_SNAP = 0.5
 
@@ -15,7 +15,7 @@ interface KeyLightProps {
   castShadow: boolean
 }
 
-/** Warm low-angle sun that rides along the spline; its shadow frustum is texel-snapped and refreshed every other frame. */
+/** Late-morning Mediterranean sun that rides along the spline; shadow frustum is texel-snapped. */
 export function KeyLight({ castShadow }: KeyLightProps) {
   const scene = useThree((state) => state.scene)
   const lightRef = useRef<DirectionalLight>(null)
@@ -46,8 +46,8 @@ export function KeyLight({ castShadow }: KeyLightProps) {
   return (
     <directionalLight
       ref={lightRef}
-      color="#ffd7b0"
-      intensity={2.6}
+      color="#fff1dc"
+      intensity={3.2}
       castShadow={castShadow}
       shadow-mapSize={[2048, 2048]}
       shadow-camera-left={-SHADOW_EXTENT}
@@ -55,26 +55,50 @@ export function KeyLight({ castShadow }: KeyLightProps) {
       shadow-camera-top={SHADOW_EXTENT}
       shadow-camera-bottom={-SHADOW_EXTENT}
       shadow-camera-near={0.5}
-      shadow-camera-far={95}
+      shadow-camera-far={110}
       shadow-bias={-0.0004}
       shadow-normalBias={0.05}
     />
   )
 }
 
-/** Cool rim + sky/ground bounce + a procedural studio environment (no remote HDR) for glass and concrete reflections. */
+/** Cool sky bounce + warm ground bounce + a procedural daylight environment (no remote HDR). */
 export function SceneLights() {
   return (
     <>
-      <hemisphereLight args={['#6f7f9c', '#1d1a18', 0.7]} />
-      <directionalLight position={[16, 9, -18]} color="#93a8cf" intensity={0.9} />
-      <Environment resolution={256} frames={1} environmentIntensity={0.45}>
-        <Lightformer form="rect" intensity={4.5} color="#ffcf9f" position={[-9, 7, 7]} rotation-y={Math.PI / 3} scale={[12, 6, 1]} />
-        <Lightformer form="rect" intensity={3} color="#6c8bd0" position={[10, 5, -9]} rotation-y={-Math.PI / 3} scale={[14, 5, 1]} />
-        <Lightformer form="ring" intensity={2.2} color="#ffe2bd" position={[0, 12, 0]} rotation-x={Math.PI / 2} scale={8} />
-        <Lightformer form="rect" intensity={1.2} color="#ffffff" position={[0, 2, 12]} scale={[18, 2, 1]} />
+      <hemisphereLight args={['#b7c8dc', '#c9bba8', 1.15]} />
+      <directionalLight position={[18, 10, -16]} color="#dce6f2" intensity={0.55} />
+      <Environment resolution={256} frames={1} environmentIntensity={0.7}>
+        <Lightformer form="rect" intensity={6.5} color="#fff4e0" position={[-12, 14, 8]} rotation-y={Math.PI / 3} scale={[16, 8, 1]} />
+        <Lightformer form="rect" intensity={3.2} color="#c5d6ea" position={[12, 8, -10]} rotation-y={-Math.PI / 3} scale={[16, 7, 1]} />
+        <Lightformer form="ring" intensity={2.8} color="#fffaf0" position={[0, 16, 0]} rotation-x={Math.PI / 2} scale={10} />
+        <Lightformer form="rect" intensity={1.6} color="#f4eee4" position={[0, 3, 14]} scale={[20, 3, 1]} />
       </Environment>
     </>
+  )
+}
+
+interface SunDiscProps {
+  visible: boolean
+}
+
+/** Bright disc in the sun direction so the sky has a readable light source. */
+export function SunDisc({ visible }: SunDiscProps) {
+  const meshRef = useRef<Mesh>(null)
+
+  useFrame(() => {
+    const mesh = meshRef.current
+    if (!mesh) return
+    mesh.position.set(sceneState.cameraTarget.x + KEY_OFFSET.x * 3.2, KEY_OFFSET.y * 2.6, sceneState.cameraTarget.z + KEY_OFFSET.z * 3.2)
+  })
+
+  if (!visible) return null
+
+  return (
+    <mesh ref={meshRef} frustumCulled={false}>
+      <sphereGeometry args={[2.6, 16, 16]} />
+      <meshBasicMaterial color="#fff6e4" toneMapped={false} />
+    </mesh>
   )
 }
 
@@ -93,23 +117,23 @@ const horizonFragment = /* glsl */ `
   varying vec3 vDirection;
   void main() {
     float h = vDirection.y;
-    vec3 color = mix(uHorizon, uTop, smoothstep(0.0, 0.32, h));
-    color = mix(color, uBottom, smoothstep(0.0, -0.25, h));
-    float glow = exp(-pow(h * 5.5, 2.0));
-    color += uHorizon * glow * 0.35;
+    vec3 color = mix(uHorizon, uTop, smoothstep(0.0, 0.42, h));
+    color = mix(color, uBottom, smoothstep(0.0, -0.22, h));
+    float glow = exp(-pow(h * 4.2, 2.0));
+    color += uHorizon * glow * 0.22;
     gl_FragColor = vec4(color, 1.0);
     #include <colorspace_fragment>
   }
 `
 
-/** Large inverted dome with a warm dusk band on the horizon; follows the camera so it never parallaxes. */
+/** Inverted dome with a pale Mediterranean sky and a warm limestone horizon band. */
 export function HorizonGlow() {
   const meshRef = useRef<Mesh>(null)
   const material = useMemo(
     () => ({
-      uTop: { value: new Color('#07080b') },
-      uHorizon: { value: new Color('#3a2a2c') },
-      uBottom: { value: new Color('#0a0b0e') }
+      uTop: { value: new Color('#8eabc4') },
+      uHorizon: { value: new Color('#f0e6d4') },
+      uBottom: { value: new Color('#d4cfc4') }
     }),
     []
   )

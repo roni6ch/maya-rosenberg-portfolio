@@ -81,16 +81,16 @@ const FACADE_COLOR_GLSL = /* glsl */ `
   float averageMask = vParams.z * 0.5 * (1.0 - isTop) * step(0.35, vLocal.y);
   float winMask = mix(nearMask, averageMask, farBlend);
   float litRoll = hash21(cellId * 1.31 + seedOffset + 7.7);
-  float flicker = 0.88 + 0.12 * sin(uTime * 0.6 + litRoll * 40.0);
-  float litAmount = mix(step(litRoll, 0.16 + 0.32 * vParams.w) * flicker, (0.16 + 0.32 * vParams.w) * 0.9, farBlend);
+  float flicker = 0.92 + 0.08 * sin(uTime * 0.35 + litRoll * 40.0);
+  float litAmount = mix(step(litRoll, 0.05 + 0.1 * vParams.w) * flicker, (0.05 + 0.1 * vParams.w) * 0.7, farBlend);
   float winLit = winMask * litAmount;
   float edgeLine = 1.0 - smoothstep(0.0, 0.02 + fwidth(edgeDist) * 1.2, edgeDist);
   float seam = (1.0 - smoothstep(0.0, 0.035, cellUv.y)) * (1.0 - isTop) * detail * 0.28;
   float groundAo = mix(0.4, 1.0, smoothstep(0.0, 1.9, vWorldY));
 
   diffuseColor.rgb *= groundAo * (1.0 - seam);
-  diffuseColor.rgb += edgeLine * 0.05;
-  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.008, 0.012, 0.018), winMask);
+  diffuseColor.rgb += edgeLine * 0.04;
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.58, 0.66, 0.72), winMask);
 `
 
 const FILMIC_GLSL = /* glsl */ `
@@ -195,14 +195,14 @@ export function createVolumeMaterials({ displace }: CreateVolumeMaterialsParams)
       .replace(
         '#include <emissivemap_fragment>',
         /* glsl */ `#include <emissivemap_fragment>
-        vec3 litColor = mix(vec3(1.0, 0.66, 0.36), vec3(0.78, 0.88, 1.0), step(0.8, hash21(cellId + seedOffset + 3.3)) * (1.0 - farBlend));
-        totalEmissiveRadiance += litColor * winLit * (0.7 + 0.9 * vParams.w) * vParams.w;
-        totalEmissiveRadiance += vec3(1.0, 0.72, 0.45) * edgeLine * detail * (0.03 + 0.1 * vParams.w);`
+        vec3 litColor = mix(vec3(1.0, 0.92, 0.78), vec3(0.82, 0.9, 1.0), step(0.8, hash21(cellId + seedOffset + 3.3)) * (1.0 - farBlend));
+        totalEmissiveRadiance += litColor * winLit * (0.18 + 0.22 * vParams.w) * vParams.w;
+        totalEmissiveRadiance += vec3(0.95, 0.88, 0.76) * edgeLine * detail * 0.04;`
       )
       .replace('#include <tonemapping_fragment>', FILMIC_GLSL)
   }
 
-  const box = new MeshStandardMaterial({ color: '#ffffff', roughness: 0.82, metalness: 0.06, flatShading: true })
+  const box = new MeshStandardMaterial({ color: '#ffffff', roughness: 0.78, metalness: 0.05, flatShading: true })
   box.onBeforeCompile = (shader) => patch({ shader })
 
   const cylinder = new MeshStandardMaterial({ color: '#ffffff', roughness: 0.78, metalness: 0.1 })

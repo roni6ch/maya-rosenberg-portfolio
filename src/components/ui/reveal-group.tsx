@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import type { ElementType, ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { ElementType, ReactNode, RefObject } from 'react'
 import { useScrollReveal } from '@/hooks/use-scroll-reveal'
 
 interface RevealGroupProps {
@@ -13,13 +13,35 @@ interface RevealGroupProps {
   lang?: string
 }
 
-/** Server-component friendly boundary: everything inside with [data-reveal] animates in on scroll. */
+/** Server-component friendly boundary: [data-reveal] children animate once the section nears the viewport. */
 export function RevealGroup({ children, className, as: Tag = 'div', dir, lang }: RevealGroupProps) {
   const rootRef = useRef<HTMLElement>(null)
-  useScrollReveal({ rootRef })
+  const isNear = useNearViewport(rootRef)
+  useScrollReveal({ rootRef, enabled: isNear })
   return (
     <Tag ref={rootRef} className={className} dir={dir} lang={lang}>
       {children}
     </Tag>
   )
+}
+
+function useNearViewport(rootRef: RefObject<HTMLElement>) {
+  const [isNear, setIsNear] = useState(false)
+
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root || isNear) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        setIsNear(true)
+        observer.disconnect()
+      },
+      { rootMargin: '25% 0px' }
+    )
+    observer.observe(root)
+    return () => observer.disconnect()
+  }, [rootRef, isNear])
+
+  return isNear
 }

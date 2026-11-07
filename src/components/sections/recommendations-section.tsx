@@ -1,3 +1,4 @@
+import { HebrewFont } from '@/components/ui/hebrew-font'
 import { RevealGroup } from '@/components/ui/reveal-group'
 import type { SiteContent } from '@/types/portfolio'
 
@@ -9,7 +10,8 @@ export function RecommendationsSection({ content }: RecommendationsSectionProps)
   const { recommendations, recommendationsHeading } = content
   if (!recommendations.length) return null
   return (
-    <section id="recommendations" className="border-t border-ink/10 bg-paper px-6 py-28 md:px-12 md:py-40">
+    <section id="recommendations" className="relative z-[2] border-t border-ink/10 bg-paper px-6 py-28 md:px-12 md:py-40">
+      <HebrewFont />
       <div className="mx-auto max-w-[110rem]">
         <h2 className="mb-16 text-[clamp(1.6rem,4vw,3.2rem)] font-extralight uppercase tracking-[0.2em] md:mb-24">{recommendationsHeading}</h2>
         <RevealGroup dir="rtl" lang="he" className="font-hebrew gap-x-16 md:columns-2">

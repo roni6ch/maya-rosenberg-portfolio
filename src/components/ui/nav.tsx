@@ -28,7 +28,7 @@ export function Nav() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 text-white mix-blend-difference transition-opacity duration-1000 md:px-12 ${introDone ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        className={`fixed inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-[max(1.25rem,env(safe-area-inset-top))] text-white mix-blend-difference transition-opacity duration-1000 md:px-12 ${introDone ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       >
         <button type="button" onClick={() => goTo({ target: '#journey' })} className="text-[11px] font-light uppercase tracking-[0.4em]">
           Maya Rosenberg
@@ -50,7 +50,7 @@ export function Nav() {
           aria-expanded={isMenuOpen}
           aria-controls="mobile-menu"
           onClick={() => setIsMenuOpen((open) => !open)}
-          className="text-[11px] font-light uppercase tracking-[0.3em] lg:hidden"
+          className="min-h-11 min-w-11 text-[11px] font-light uppercase tracking-[0.3em] lg:hidden"
         >
           {isMenuOpen ? 'Close' : 'Menu'}
         </button>

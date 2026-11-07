@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  background: #0a0b0e;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped,
+html.is-intro,
+html.is-intro body,
+html.is-detail,
+html.is-detail body {
+  overflow: hidden;
+}
+
+/* accessibility toolbar modes (see accessibility-toolbar.tsx) */
+html.a11y-underline a {
+  text-decoration: underline !important;
+  text-underline-offset: 4px;
+}
+html.a11y-readable,
+html.a11y-readable body,
+html.a11y-readable * {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: normal !important;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 60;
+  transform: translateY(-200%);
+  background: #ece8df;
+  color: #0a0b0e;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.8rem;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+::selection {
+  background: #0b0b0b;
+  color: #f2f1ed;
+}
+
+.font-hebrew {
+  font-family: 'Heebo Variable', system-ui, sans-serif;
+}
+
+.loader-line {
+  transform: translateX(-100%);
+  animation: loader-sweep 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes loader-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.scroll-cue {
+  transform-origin: top;
+  animation: cue 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes cue {
+  0% {
+    transform: scaleY(0);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-line,
+  .scroll-cue {
+    animation: none;
+  }
+}
